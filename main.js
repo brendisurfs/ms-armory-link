@@ -79,15 +79,9 @@ async function msPlugin() {
 
         socket.on("data", buf => {
             // need to get an iter object out of this. 
-            let bufferJSON = JSON.stringify(buf.toJSON());
-            fs.writeFile("./buffer.json", bufferJSON, (err)=> {
-                if (err) {
-                    console.log(err);
-                } else {
-                    console.log("wrote to json file");
-                }
-            });
-
+            let bufferJSON = JSON.parse(buf);
+            console.log(bufferJSON);
+            
         })
     })
     // log that the server successfully started up
