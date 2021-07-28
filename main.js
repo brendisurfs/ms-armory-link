@@ -5,6 +5,7 @@
 
 const net = require("net");
 const fs = require("fs");
+const { StringDecoder } = require("string_decoder");
 
 const PORT = 24981;
 const BUFFER_SIZE = 4096 * 2;
@@ -19,11 +20,23 @@ const socketObject = {
     // timeout: 5000,
 }
 
+// const materialObject = {
+//     // break down the returned object into various optional types here
+//     albedo?: albedo,
+//     ao?: ao,
+//     displacement?: displacement, 
+//     metalness?: metalness,
+//     normal?: normal,
+//     roughness?: roughness,
+//     specular?: specular,
+// }
+
+
 // reader function: reads the import from quixel bridge.
 function msReader(importedAssetsArr) {
  
     for (i in importedAssetsArr) {
-        assetID = asset['AssetID'];
+        let assetID = asset['AssetID'];
         console.log(`imported asset id is: ${assetID}`);
     }
 }
@@ -51,18 +64,34 @@ async function msLink(reader, writer) {
         msAssetImporter(data.reader())
     }
 };
+
+// ========MAIN FN==================
 // setting server and connection
 async function msPlugin() {
-    // connect to port PORT, allocate a buffer size to use, and do what we want on our callback.
-    net.connect({
-        port: PORT,
-        onread: {
-            buffer: Buffer.alloc(BUFFER_SIZE),
-            callback: (nread, buf) => {
-                console.log(buf.toString("utf8", 0, nread));
-            }
-        }
+    
+    /*connect to port PORT, 
+    allocate a buffer size to use, 
+    and do what we want on our callback. **/
+    const server = net.createServer();
+
+    server.on("connection", socket => {
+        console.log(`connected to socket!`);
+
+        socket.on("data", buf => {
+            // need to get an iter object out of this. 
+            let bufferJSON = JSON.stringify(buf.toJSON());
+            fs.writeFile("./buffer.json", bufferJSON, (err)=> {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("wrote to json file");
+                }
+            });
+
+        })
     })
+    // log that the server successfully started up
+    server.listen(PORT, ()=> console.log(`app started on port: ${PORT}`));
 }
 
 msPlugin();
