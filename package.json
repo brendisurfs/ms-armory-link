@@ -1,6 +1,10 @@
 {
-  "name": "Bridge-ArmorPaint",
-  "version": "1.0.0",
+  "name": "ms-armory-link",
+  "author": {
+    "name": "Brendan Prednis",
+    "url": "https://brendancreates.dev"
+  },
+  "version": "0.1.0",
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
