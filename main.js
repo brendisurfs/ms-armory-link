@@ -18,42 +18,64 @@ const socketObject = {
     port: PORT,
     // timeout: 5000,
 }
-
-// const materialObject = {
-    //     // break down the returned object into various optional types here
-    //     albedo?: albedo,
-    //     ao?: ao,
-    //     displacement?: displacement, 
-    //     metalness?: metalness,
-    //     normal?: normal,
-    //     roughness?: roughness,
-    //     specular?: specular,
-    // }
-    
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
 // ========MAIN FN==================
 // server startup
 async function msPlugin() {
     const server = net.createServer();
     server.on("connection", socket => {
-        console.log(`connected to socket!`);
+        console.log(`connection received from Quixel Bridge!`);
 
         // TThis returns an object we can iterate and desctucture into an Armory material.
         socket.on("data", buf => {
-            let bufferJSON = JSON.parse(buf)[0];
-            msReader(bufferJSON);
+            if (buf.length > 0) {
+                let bufferJSON = JSON.parse(buf)[0];
+                msReader(bufferJSON);
+            } else {
+                console.error("could not read bytes, make sure you have the correct port in Quixel Bridge.");
+            }
+            // NOTE: This should be handled as either an error depending on the length.
         });
     })
     // log that the server successfully started up
-    server.listen(PORT, ()=> console.log(`app started on port: ${PORT}`));
-}
-
-// reader function: reads the import from quixel bridge.
+    server.listen(socketObject.port, ()=> console.log(`MS-Armory plugin started on localhost:${socketObject.port}`));
+};
+msPlugin();
+/**
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+// ==READER==: reads the import from quixel bridge.
 async function msReader(assetObj) {
-    console.log(assetObj);
+    // console.log(assetObj);
+    let materialName = assetObj.name;
+    console.log(materialName);
+    let matComponents = assetObj.components;
+    matComponents.map(texture => {
+        let mapType = texture.type;
+        let mapPath = texture.path;
+        let mapName = texture.name;
+
+        // add to an array of these objects, turn into a material object.
+        console.log(mapType, {mapName, mapPath});
+    });
+    makeArmorMat();
 };
 // make armor mat
 async function makeArmorMat() {
-    console.log("making armor mat");
-}
+    console.log("making Armory material...");
 
-msPlugin();
+    // make armory material.
+}
